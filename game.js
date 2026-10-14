@@ -13,41 +13,98 @@ image.src = './Images/Pellet Town.png'
  const playerImage = new Image()
  playerImage.src = './Images/playerDown.png'
 
-image.onload = () => {
-c.drawImage(image, -740, -600)
-c.drawImage(
-    playerImage,
-    0, 
-    0, 
-    playerImage.width / 4, 
-    playerImage.height, 
-    canvas.width / 2 - (playerImage.width / 4) / 2, 
-    canvas.height / 2 - playerImage.height / 2,
-    playerImage.width / 4, 
-    playerImage.height)
+class Sprite{
+    constructor({posittion, velocity, image}) {
+        this.position = position
+        this.image = image
+    }
+
+    draw() {
+        c.drawImage(this.image, this.position.x, this.position.y)
+    }
+}
+
+const backround = new Sprite({
+    position: {
+        x : -740,
+        y : -600
+    },
+    image: image
+})
+
+const keys = {
+    w: {
+        pressed : false
+    },  
+    a: {
+        pressed : false
+    },   
+    s: {
+        pressed : false
+    },   
+    d: {
+        pressed : false
+    }
 }
 
 function AnimationEffect() {
     window.requestAnimationFrame(animate)
-    console.log(animate)
+    backround.draw()
+    c.drawImage(image, -740, -600)
+    c.drawImage(
+        playerImage,
+        0, 
+        0, 
+        playerImage.width / 4, 
+        playerImage.height, 
+        canvas.width / 2 - (playerImage.width / 4) / 2, 
+        canvas.height / 2 - playerImage.height / 2,
+        playerImage.width / 4, 
+        playerImage.height
+    )
+
+    if (keys.w.pressed) backround.position.y = backround.position.y + 3
+    else if (keys.a.pressed) backround.position.x = backround.position.x + 3
+    else if (keys.s.pressed) backround.position.y = backround.position.y - 3
+    else if (keys.d.pressed) backround.position.x = backround.position.x - 3
 }
 
 window.addEventListener('keydown', (e) => {
     switch (e.key) {
         case 'w':
-            console.log('pressed w key')
+            keys.w.pressed = true
             break
     
         case 'a':
-            console.log('pressed a key')
+            keys.a.pressed = true
             break
     
         case 's':
-            console.log('pressed s key')
+            keys.s.pressed = true
             break
        
         case 'd':
-            console.log('pressed d key')
+            keys.d.pressed = true
+            break      
+        }
+})
+
+window.addEventListener('keyup', (e) => {
+    switch (e.key) {
+        case 'w':
+            keys.w.pressed = false
+            break
+    
+        case 'a':
+            keys.a.pressed = false
+            break
+    
+        case 's':
+            keys.s.pressed = false
+            break
+       
+        case 'd':
+            keys.d.pressed = false
             break      
         }
 })
