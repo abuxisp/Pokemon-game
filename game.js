@@ -10,6 +10,8 @@ for (let i = 0; i < collisions.length; i += 70) {
 }
 
 class Boundary {
+    static width = 48
+    static height = 48
     constructor({position}) {
         this.position = position
         this.width = 48
@@ -17,15 +19,24 @@ class Boundary {
     }
 
     draw() {
+        c.fillStyle = 'red'
         c.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
 }
 
 const boundaries = []
 
-collisonsMap.forEach(row => {
-    row.forEach(symbol =>{
-        
+collisionsMap.forEach((row, i) => {
+    row.forEach((symbol, j) => {
+        if (symbol !== 0)
+        boundaries.push(
+            new Boundary({
+                position: {
+                x: j * Boundary.width,
+                y: i * Boundary.height
+             }
+            })
+        )
     })
 })
 
