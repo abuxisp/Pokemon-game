@@ -1,20 +1,42 @@
 const canvas = document.querySelector('canvas')
-const c = canvas.getContext("2d")
+const c = canvas.getContext('2d')
 
 canvas.width = 1024
 canvas.height = 576
 
-c.fillStyle = 'white'
-c.fillRect(0, 0, canvas.width, canvas.height)
+const collisionsMap = []
+for (let i = 0; i < collisions.length; i += 70) {
+    collisionsMap.push(collisions.slice(i, 70 + i))
+}
+
+class Boundary {
+    constructor({position}) {
+        this.position = position
+        this.width = 48
+        this.height = 48
+    }
+
+    draw() {
+        c.fillRect(this.position.x, this.position.y, this.width, this.height)
+    }
+}
+
+const boundaries = []
+
+collisonsMap.forEach(row => {
+    row.forEach(symbol =>{
+        
+    })
+})
 
 const image = new Image()
 image.src = './Images/Pellet Town.png'
 
- const playerImage = new Image()
- playerImage.src = './Images/playerDown.png'
+const playerImage = new Image()
+playerImage.src = './Images/playerDown.png'
 
-class Sprite{
-    constructor({posittion, velocity, image}) {
+class Sprite {
+    constructor({ position, velocity, image }) {
         this.position = position
         this.image = image
     }
@@ -24,33 +46,38 @@ class Sprite{
     }
 }
 
-const backround = new Sprite({
+const background = new Sprite({
     position: {
-        x : -740,
-        y : -600
+        x: -740,
+        y: -600
     },
     image: image
 })
 
 const keys = {
     w: {
-        pressed : false
-    },  
+        pressed: false
+    },
     a: {
-        pressed : false
-    },   
+        pressed: false
+    },
     s: {
-        pressed : false
-    },   
+        pressed: false
+    },
     d: {
-        pressed : false
+        pressed: false
     }
 }
 
-function AnimationEffect() {
+let lastKey = ''
+
+function animate() {
     window.requestAnimationFrame(animate)
-    backround.draw()
-    c.drawImage(image, -740, -600)
+    c.fillStyle = 'white'
+    c.fillRect(0, 0, canvas.width, canvas.height)
+    
+    background.draw()
+    
     c.drawImage(
         playerImage,
         0, 
@@ -63,30 +90,33 @@ function AnimationEffect() {
         playerImage.height
     )
 
-    if (keys.w.pressed) backround.position.y = backround.position.y + 3
-    else if (keys.a.pressed) backround.position.x = backround.position.x + 3
-    else if (keys.s.pressed) backround.position.y = backround.position.y - 3
-    else if (keys.d.pressed) backround.position.x = backround.position.x - 3
+    if (keys.w.pressed && lastKey === 'w') background.position.y += 3
+    else if (keys.a.pressed && lastKey === 'a') background.position.x += 3
+    else if (keys.s.pressed && lastKey === 's') background.position.y -= 3
+    else if (keys.d.pressed && lastKey === 'd') background.position.x -= 3
 }
+
+animate()
 
 window.addEventListener('keydown', (e) => {
     switch (e.key) {
         case 'w':
             keys.w.pressed = true
+            lastKey = 'w'
             break
-    
         case 'a':
             keys.a.pressed = true
+            lastKey = 'a'
             break
-    
         case 's':
             keys.s.pressed = true
+            lastKey = 's'
             break
-       
         case 'd':
             keys.d.pressed = true
-            break      
-        }
+            lastKey = 'd'
+            break         
+    }
 })
 
 window.addEventListener('keyup', (e) => {
@@ -94,17 +124,14 @@ window.addEventListener('keyup', (e) => {
         case 'w':
             keys.w.pressed = false
             break
-    
         case 'a':
             keys.a.pressed = false
             break
-    
         case 's':
             keys.s.pressed = false
             break
-       
         case 'd':
             keys.d.pressed = false
-            break      
-        }
+            break         
+    }
 })
