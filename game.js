@@ -25,15 +25,19 @@ class Boundary {
 }
 
 const boundaries = []
+const offset = {
+    x: -740,
+    y: -620
+}
 
 collisionsMap.forEach((row, i) => {
     row.forEach((symbol, j) => {
-        if (symbol !== 0)
+        if (symbol === 1025)
         boundaries.push(
             new Boundary({
                 position: {
-                x: j * Boundary.width,
-                y: i * Boundary.height
+                x: j * Boundary.width + offset.x,
+                y: i * Boundary.height + offset.y
              }
             })
         )
@@ -57,10 +61,12 @@ class Sprite {
     }
 }
 
+
+
 const background = new Sprite({
     position: {
-        x: -740,
-        y: -600
+        x: offset.x,
+        y: offset.y
     },
     image: image
 })
@@ -80,15 +86,18 @@ const keys = {
     }
 }
 
-let lastKey = ''
 
+
+let lastKey = '';
 function animate() {
     window.requestAnimationFrame(animate)
     c.fillStyle = 'white'
     c.fillRect(0, 0, canvas.width, canvas.height)
     
     background.draw()
-    
+    boundaries.forEach(boundary => {
+        boundary.draw()
+    })
     c.drawImage(
         playerImage,
         0, 
