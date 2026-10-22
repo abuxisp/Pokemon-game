@@ -32,8 +32,38 @@ collisionsMap.forEach((row, i) => {
 const image = new Image()
 image.src = './Images/Pellet Town.png'
 
+const foregroundImage = new Image()
+foregroundImage.src = './Images/foregroundObjects.png'
+
 const playerImage = new Image()
 playerImage.src = './Images/playerDown.png'
+
+const player = new Sprite({
+        position : {
+        x: canvas.width / 2 - 192 / 4 / 2,
+        y: canvas.height / 2 - 68 / 2
+    },
+    image: playerImage,
+    frames: {
+        max: 4
+    }
+})
+
+const background = new Sprite({
+    position: {
+        x: offset.x,
+        y: offset.y
+    },
+    image: image
+})
+
+const foreground = new Sprite({
+    position: {
+        x: offset.x,
+        y: offset.y
+    },
+    image: foregroundImage
+})
 
 const keys = {
     w: {
@@ -56,7 +86,7 @@ const keys = {
 
 let lastKey = '';
 
-const movables = [background, ...boundaries]
+const movables = [background, ...boundaries, foreground]
 
 function rectangularCollision({ rectangle1, rectangle2 }) {
     return (
@@ -75,10 +105,13 @@ function animate() {
 
     })
     player.draw()
+    foreground.draw()
 
 
     let moving = true
+        player.moving = false
     if (keys.w.pressed && lastKey === 'w') {
+        player.moving = true
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
