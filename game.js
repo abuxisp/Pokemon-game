@@ -9,6 +9,11 @@ for (let i = 0; i < collisions.length; i += 70) {
     collisionsMap.push(collisions.slice(i, 70 + i))
 }
 
+const battleZonesMap = []
+for (let i = 0; i < battleZonesData.length; i += 70) {
+    battleZonesMap.push(battleZonesData.slice(i, 70 + i))
+}
+
 const boundaries = []
 const offset = {
     x: -740,
@@ -29,23 +34,54 @@ collisionsMap.forEach((row, i) => {
     })
 })
 
+const battleZones = []
+
+battleZonesMap.forEach((row, i) => {
+    row.forEach((symbol, j) => {
+        if (symbol === 1025)
+        battleZones.push(
+            new Boundary({
+                position: {
+                x: j * Boundary.width + offset.x,
+                y: i * Boundary.height + offset.y
+             }
+            })
+        )
+    })
+})
+
 const image = new Image()
 image.src = './Images/Pellet Town.png'
 
 const foregroundImage = new Image()
 foregroundImage.src = './Images/foregroundObjects.png'
 
-const playerImage = new Image()
-playerImage.src = './Images/playerDown.png'
+const playerDownImage = new Image()
+playerDownImage.src = './Images/playerDown.png'
+
+const playerUpImage = new Image()
+playerUpImage.src = './Images/playerUp.png'
+
+const playerLeftImage = new Image()
+playerLeftImage.src = './Images/playerLeft.png'
+
+const playerRightImage = new Image()
+playerRightImage.src = './Images/playerRight.png'
 
 const player = new Sprite({
         position : {
         x: canvas.width / 2 - 192 / 4 / 2,
         y: canvas.height / 2 - 68 / 2
     },
-    image: playerImage,
+    image: playerDownImage,
     frames: {
         max: 4
+    },
+    sprites: {
+        up: playerUpImage,
+        left: playerLeftImage,
+        right: playerRightImage,
+        down: playerDownImage
     }
 })
 
@@ -86,7 +122,7 @@ const keys = {
 
 let lastKey = '';
 
-const movables = [background, ...boundaries, foreground]
+const movables = [background, ...boundaries, foreground, ...battleZones]
 
 function rectangularCollision({ rectangle1, rectangle2 }) {
     return (
@@ -104,6 +140,9 @@ function animate() {
         boundary.draw()
 
     })
+    battleZones.forEach(battleZone => {
+        battleZone.draw()
+    })
     player.draw()
     foreground.draw()
 
@@ -112,6 +151,8 @@ function animate() {
         player.moving = false
     if (keys.w.pressed && lastKey === 'w') {
         player.moving = true
+        player.image = player.sprites.up
+
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
@@ -127,7 +168,21 @@ function animate() {
         moving = false
          break
     }
-        }
+}
+
+for (let i = 0; i < battleZones.length; i++) {
+            const battleZone = battleZones[i]
+            if (
+        rectangularCollision({
+            rectangle1: player,
+            rectangle2: battleZone
+
+            })
+             ) {
+        console.log('battle zone collision');
+         break
+    }
+}
 
         if (moving)
         movables.forEach ((movable) => {
@@ -135,6 +190,8 @@ function animate() {
         })
     }
     else if (keys.a.pressed && lastKey === 'a') {
+        player.moving = true
+        player.image = player.sprites.left
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
@@ -158,6 +215,8 @@ function animate() {
         })
     }
     else if (keys.s.pressed && lastKey === 's') {
+        player.moving = true
+        player.image = player.sprites.down
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
@@ -181,6 +240,8 @@ function animate() {
         })
     }
     else if (keys.d.pressed && lastKey === 'd') {
+        player.moving = true
+        player.image = player.sprites.right
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
