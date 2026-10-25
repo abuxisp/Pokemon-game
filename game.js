@@ -411,22 +411,50 @@ let lastKey = ''
 window.addEventListener('keydown', (e) => {
     if (player.isInteracting) {
         switch (e.key) {
-            case 'w':
-                keys.w.pressed = true
-                lastKey = 'w'
+            case ' ':
+                player.interactionAsset.dialogueIndex++
+
+                const { dialogueIndex, dialogue } = player.interactionAsset
+                if (dialogueIndex <= dialogue.length - 1) {
+                    document.querySelector('#charcaterDialogueBox').innerHTML =
+                        player.interactionAsset.dialogue[dialogueIndex]
+                    return
+                }
+
+                player.isInteracting = false
+                player.interactionAsset.dialogueIndex = 0
+                document.querySelector('#characterDialogueBox').computedStyleMap.display = 'none'
+
                 break
-            case 'a':
-                keys.a.pressed = true
-                lastKey = 'a'
-                break
-            case 's':
-                keys.s.pressed = true
-                lastKey = 's'
-                break
-            case 'd':
-                keys.d.pressed = true
-                lastKey = 'd'
-                break         
+            }
+            return
+        }
+
+        switch (e.key) {
+            case' ':
+            if (!player.interactionAsset) return
+
+            const firstMessage = player.interactionAsset.dialogue[0]
+            document.querySelector('#characterDialogueBox').innerHTML = firstMessage
+            document.querySelector('#characterDialogueBox').computedStyleMap.display = 'flex'
+            player.isInteracting = true  
+            break          
+        case 'w':
+            keys.w.pressed = true
+            lastKey = 'w'
+            break
+        case 'a':
+            keys.a.pressed = true
+            lastKey = 'a'
+            break
+        case 's':
+            keys.s.pressed = true
+            lastKey = 's'
+            break
+        case 'd':
+            keys.d.pressed = true
+            lastKey = 'd'
+            break         
     }
 })
 
@@ -444,5 +472,13 @@ window.addEventListener('keyup', (e) => {
         case 'd':
             keys.d.pressed = false
             break         
+    }
+})
+
+let clicked = false
+addEventListener('click', () => {
+    if (!clicked) {
+        audio.Map.play()
+        clicked = true
     }
 })
