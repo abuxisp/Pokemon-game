@@ -140,7 +140,8 @@ const player = new Sprite({
     },
     image: playerDownImage,
     frames: {
-        max: 4
+        max: 4,
+        hold: 10
     },
     sprites: {
         up: playerUpImage,
@@ -187,16 +188,49 @@ const keys = {
 
 let lastKey = '';
 
-const movables = [background, ...boundaries, foreground, ...battleZones]
+const movables = [background, ...boundaries, foreground, ...battleZones, characters]
+const renderables = [background, ...boundaries, ...battleZones, ...characters, player, foreground]
 
-function rectangularCollision({ rectangle1, rectangle2 }) {
-    return (
-        rectangle1.position.x + rectangle1.width >= rectangle2.position.x && 
-        rectangle1.position.x <= rectangle2.position.x + rectangle2.width &&
-        rectangle1.position.y <= rectangle2.position.y + rectangle2.height &&
-        rectangle1.position.y + rectangle1.height >= rectangle2.position.y
-    )
+const battle = {
+    initiated: false
 }
+
+function animate() {
+    const animationId = window.requestAnimationFrame(animate)
+    renderables.forEach((renderable => {
+        renderable.draw()
+    })
+
+    let moving = true
+    player.animate = false
+
+    if (battle.initiated) return
+
+    if (keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed)
+        for(let i = 0; i < battleZones.length; i++) {
+            const battleZone = battleZones[i]
+            const overlappingArea = 
+            (Math.min(
+                player.position.x + player.width,
+                battleZone.position.x + battleZone.width 
+            ) -
+                Math.max(player.position.x, battleZone.position.x)) *
+            (Math.min(
+                player.position.y + player.height,
+                battleZone.position.y + battleZone.height
+            ) -
+                Math.max(player.position.y, battleZone.position.y))
+        if(
+            rectangularCollision({ 
+                rectangle1: player,
+                rectangle2: battleZone
+            }) &&
+            overlappingArea > (player.width * player.height) / 2 &&
+            Math.random() < 0.01
+        )   {
+            
+        }
+
 
 function animate() {
     window.requestAnimationFrame(animate)
