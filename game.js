@@ -100,16 +100,7 @@ charactersMap.forEach((row, i) => {
             )
         }
 
-        if(symbol !== 0) {
-            boundaries.push(
-                new Boundary({ // Fixed typo from Bounadary
-                    position: {
-                        x: j * Boundary.width + offset.x,
-                        y: i * Boundary.height + offset.y
-                    }
-                })
-            )
-        }
+        
     })
 })
 
