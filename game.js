@@ -182,103 +182,118 @@ const keys = {
     }
 }
 
-
-
-
-
-let lastKey = '';
-
-const movables = [background, ...boundaries, foreground, ...battleZones, characters]
-const renderables = [background, ...boundaries, ...battleZones, ...characters, player, foreground]
+const movables = [
+  background,
+  ...boundaries,
+  foreground,
+  ...battleZones,
+  ...characters
+]
+const renderables = [
+  background,
+  ...boundaries,
+  ...battleZones,
+  ...characters,
+  player,
+  foreground
+]
 
 const battle = {
-    initiated: false
+  initiated: false
 }
 
 function animate() {
-    const animationId = window.requestAnimationFrame(animate)
-    renderables.forEach((renderable => {
-        renderable.draw()
-    })
+  const animationId = window.requestAnimationFrame(animate)
+  renderables.forEach((renderable) => {
+    renderable.draw()
+  })
 
-    let moving = true
-    player.animate = false
+  let moving = true
+  player.animate = false
 
-    if (battle.initiated) return
+  if (battle.initiated) return
 
-    if (keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed)
-        for(let i = 0; i < battleZones.length; i++) {
-            const battleZone = battleZones[i]
-            const overlappingArea = 
-            (Math.min(
-                player.position.x + player.width,
-                battleZone.position.x + battleZone.width 
-            ) -
-                Math.max(player.position.x, battleZone.position.x)) *
-            (Math.min(
-                player.position.y + player.height,
-                battleZone.position.y + battleZone.height
-            ) -
-                Math.max(player.position.y, battleZone.position.y))
-        if(
-            rectangularCollision({ 
-                rectangle1: player,
-                rectangle2: battleZone
-            }) &&
-            overlappingArea > (player.width * player.height) / 2 &&
-            Math.random() < 0.01
-        )   {
-            
-        }
-
-
-function animate() {
-    window.requestAnimationFrame(animate)
-    background.draw()
-    boundaries.forEach((boundary) => {
-        boundary.draw()
-
-    })
-    battleZones.forEach(battleZone => {
-        battleZone.draw()
-    })
-    player.draw()
-    foreground.draw()
-
-    if (keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed) {
-        for (let i = 0; i < battleZones.length; i++) {
-            const battleZone = battleZones[i]
-            if (
+  // activate a battle
+  if (keys.w.pressed || keys.a.pressed || keys.s.pressed || keys.d.pressed) {
+    for (let i = 0; i < battleZones.length; i++) {
+      const battleZone = battleZones[i]
+      const overlappingArea =
+        (Math.min(
+          player.position.x + player.width,
+          battleZone.position.x + battleZone.width
+        ) -
+          Math.max(player.position.x, battleZone.position.x)) *
+        (Math.min(
+          player.position.y + player.height,
+          battleZone.position.y + battleZone.height
+        ) -
+          Math.max(player.position.y, battleZone.position.y))
+      if (
         rectangularCollision({
-            rectangle1: player,
-            rectangle2: battleZone
-            })
-             ) {
-        console.log('battle zone collision');
-         break
-    }
-}
-    }
+          rectangle1: player,
+          rectangle2: battleZone
+        }) &&
+        overlappingArea > (player.width * player.height) / 2 &&
+        Math.random() < 0.01
+      ) {
+        // deactivate current animation loop
+        window.cancelAnimationFrame(animationId)
 
-    let moving = true
-        player.moving = false
+        audio.Map.stop()
+        audio.initBattle.play()
+        audio.battle.play()
+
+        battle.initiated = true
+        gsap.to('#overlappingDiv', {
+          opacity: 1,
+          repeat: 3,
+          yoyo: true,
+          duration: 0.4,
+          onComplete() {
+            gsap.to('#overlappingDiv', {
+              opacity: 1,
+              duration: 0.4,
+              onComplete() {
+                // activate a new animation loop
+                initBattle()
+                animateBattle()
+                gsap.to('#overlappingDiv', {
+                  opacity: 0,
+                  duration: 0.4
+                })
+              }
+            })
+          }
+        })
+        break
+      }
+    }
+  }
+
     if (keys.w.pressed && lastKey === 'w') {
         player.moving = true
         player.image = player.sprites.up
 
+        checkForCharacterCollision({
+            characters, 
+            player,
+            characterOffset: { x: 0, y: 3 }
+        })
+ 
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
         rectangularCollision({
             rectangle1: player,
-            rectangle2: {...boundary, position : {
+            rectangle2: {
+                ...boundary, 
+                position : {
                 x: boundary.position.x,
                 y:boundary.position.y + 3
             }}
         })
     ) {
-         console.log('collision')
-        moving = false
+         moving = false
          break
     }
 }
@@ -291,18 +306,26 @@ function animate() {
     else if (keys.a.pressed && lastKey === 'a') {
         player.moving = true
         player.image = player.sprites.left
+
+        checkForCharacterCollision({
+            characters, 
+            player,
+            characterOffset: { x: 0, y: 3 }
+        })
+
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
         rectangularCollision({
             rectangle1: player,
-            rectangle2: {...boundary, position : {
+            rectangle2: {
+                ...boundary, 
+                position : {
                 x: boundary.position.x + 3,
                 y:boundary.position.y
             }}
         })
     ) {
-         console.log('collision')
         moving = false
          break
     }
@@ -316,18 +339,26 @@ function animate() {
     else if (keys.s.pressed && lastKey === 's') {
         player.moving = true
         player.image = player.sprites.down
+
+        checkForCharacterCollision({
+            characters, 
+            player,
+            characterOffset: { x: 0, y: 3 }
+        })
+
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
         rectangularCollision({
             rectangle1: player,
-            rectangle2: {...boundary, position : {
+            rectangle2: {
+                ...boundary,
+                position : {
                 x: boundary.position.x,
                 y:boundary.position.y - 3
             }}
         })
     ) {
-         console.log('collision')
         moving = false
          break
     }
@@ -341,18 +372,26 @@ function animate() {
     else if (keys.d.pressed && lastKey === 'd') {
         player.moving = true
         player.image = player.sprites.right
+
+        checkForCharacterCollision({
+            characters, 
+            player,
+            characterOffset: { x: 0, y: 3 }
+        })
+
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i]
             if (
         rectangularCollision({
             rectangle1: player,
-            rectangle2: {...boundary, position : {
+            rectangle2: {
+                ...boundary, 
+                position : {
                 x: boundary.position.x - 3,
                 y:boundary.position.y
             }}
         })
     ) {
-         console.log('collision')
         moving = false
          break
     }
@@ -365,26 +404,29 @@ function animate() {
     }
 }
 
-animate()
+//animate()
 
+
+let lastKey = ''
 window.addEventListener('keydown', (e) => {
-    switch (e.key) {
-        case 'w':
-            keys.w.pressed = true
-            lastKey = 'w'
-            break
-        case 'a':
-            keys.a.pressed = true
-            lastKey = 'a'
-            break
-        case 's':
-            keys.s.pressed = true
-            lastKey = 's'
-            break
-        case 'd':
-            keys.d.pressed = true
-            lastKey = 'd'
-            break         
+    if (player.isInteracting) {
+        switch (e.key) {
+            case 'w':
+                keys.w.pressed = true
+                lastKey = 'w'
+                break
+            case 'a':
+                keys.a.pressed = true
+                lastKey = 'a'
+                break
+            case 's':
+                keys.s.pressed = true
+                lastKey = 's'
+                break
+            case 'd':
+                keys.d.pressed = true
+                lastKey = 'd'
+                break         
     }
 })
 
