@@ -14,6 +14,11 @@ for (let i = 0; i < battleZonesData.length; i += 70) {
     battleZonesMap.push(battleZonesData.slice(i, 70 + i))
 }
 
+const charactersMap = []
+for (let i = 0; i < charactersMapData.length; i += 70) {
+    charactersMap.push(charactersMapData.slice(i, 70 + i))
+}
+
 const boundaries = []
 const offset = {
     x: -740,
@@ -49,6 +54,66 @@ battleZonesMap.forEach((row, i) => {
         )
     })
 })
+
+const characters = []
+const villagerImg = new Image()
+villagerImg.src = './Images/villager/Idle.png'
+
+const oldManImg = new Image()
+oldManImg.src = './Images/oldMan/Idle.png'
+
+charactersMap.forEach((row, i) => {
+    row.forEach((symbol, j) => {
+        if (symbol === 1026) {
+            characters.push(
+                new Character({
+                    position: {
+                        x: j * Boundary.width + offset.x,
+                        y: i * Boundary.height + offset.y
+                    },
+                    image: villagerImg,
+                    frames: {
+                        max:4,
+                        hold: 60
+                    },
+                    scale: 3,
+                    animate: true,
+                    dialogue: ['...', 'Hey mister, have you seen my Doggochu?']
+                })
+            )
+        }
+        else if (symbol === 1031) {
+            characters.push(
+                new Character({
+                    position: {
+                        x: j * Boundary.width + offset.x,
+                        y: i * Boundary.height + offset.y
+                    },
+                    image: oldManImg,
+                    frames: {
+                        max: 4,
+                        hold: 60
+                    },
+                    scale: 3,
+                    dialogue: ['My bones hurt.']
+                })
+            )
+        }
+
+        if(symbol !== 0) {
+            boundaries.push(
+                new Bounadary({
+                    position: {
+                        x: j * Boundary.width + offset.x,
+                        y: i * Boundary.height + offset.y
+                    }
+                })
+            )
+        }
+    })
+})
+
+
 
 const image = new Image()
 image.src = './Images/Pellet Town.png'
@@ -153,7 +218,6 @@ function animate() {
         rectangularCollision({
             rectangle1: player,
             rectangle2: battleZone
-
             })
              ) {
         console.log('battle zone collision');
